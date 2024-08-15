@@ -1,4 +1,5 @@
 import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore"; // Import Firestore
 import dotenv from 'dotenv';
 
 // Load environment variables from .env file
@@ -16,3 +17,8 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+// Initialize Firestore and export it
+const db = getFirestore(app);
+
+export { db };
