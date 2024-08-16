@@ -2,7 +2,7 @@ import { Container, Typography, Box, Grid, Paper } from '@mui/material';
 
 export default function ProductSection() {
   return (
-    <Container maxWidth="lg" id="product" sx={{ my: 8 }}>
+    <Container maxWidth="lg" id="product" sx={{ my: 20 }}>
       <Grid container spacing={4} alignItems="center">
         {/* Left Column: Heading and Description */}
         <Grid item xs={12} md={6}>
@@ -29,10 +29,11 @@ export default function ProductSection() {
                 <Paper
                   elevation={2}
                   sx={{
+                    my: 3,
                     p: 2,
                     backgroundColor: item.bgColor,
                     borderRadius: 2,
-                    transform: `rotate(${index % 2 === 0 ? '-2deg' : '2deg'})`,
+                    transform: `rotate(${index % 2 === 0 ? '4deg' : '-4deg'})`,
                   }}
                 >
                   <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>

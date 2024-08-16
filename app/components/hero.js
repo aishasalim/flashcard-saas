@@ -4,7 +4,7 @@ import { Container, Box, Typography, Button, Link as MuiLink } from '@mui/materi
 export default function HeroSection() {
   return (
     <Container maxWidth="lg">
-      <Box sx={{ textAlign: 'center', my: 8 }}>
+      <Box sx={{ textAlign: 'center', my: 20 }}>
         <Typography variant="h2" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
           Transform Your Learning with AI-Powered Flashcards
         </Typography>
@@ -14,6 +14,7 @@ export default function HeroSection() {
         <Button variant="contained" color="inherit"
             sx={{
                 mt: 4,
+                mx: 4,
                 fontWeight: 'bold',
                 backgroundColor: 'black',
                 color: 'white',
@@ -21,9 +22,24 @@ export default function HeroSection() {
                 '&:hover': {
                 backgroundColor: 'black',
                 boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.3)',
-                },}}>
+                },}} href='sign-in'>
           Get Started
         </Button>
+        <Button variant="outlined"
+            sx={{
+              mt: 4,
+              mx: 4,
+              fontWeight: 'bold',
+              borderColor: 'black', // Set the outline color to black
+              color: 'black',       // Set the text color to black
+              backgroundColor: 'white', // Set the background to white
+              '&:hover': {
+                backgroundColor: 'black', // Background color changes to black on hover
+                color: 'white',           // Text color changes to white on hover
+                borderColor: 'black',     // Keep the border color black on hover
+              },}}>
+            Generate Cards
+          </Button>
       </Box>
     </Container>
   );

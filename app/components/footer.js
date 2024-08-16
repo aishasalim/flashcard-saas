@@ -2,7 +2,7 @@ import { Container, Grid, Typography, TextField, Button, Link as MuiLink, Box } 
 
 export default function Footer() {
   return (
-    <Box component="footer" sx={{ backgroundColor: '#f8f8f8', py: 4 }}>
+    <Box component="footer" sx={{ backgroundColor: '#f8f8f8', py: 4, mt: 10 }}>
       <Container maxWidth="lg">
         <Grid container spacing={4} justifyContent="space-between">
 

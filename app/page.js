@@ -58,7 +58,6 @@ export default function Home() {
             <Link href="/sign-in" passHref>
             <Button variant="outlined"
             sx={{
-              mt: 4,
               fontWeight: 'bold',
               borderColor: 'black', // Set the outline color to black
               color: 'black',       // Set the text color to black
@@ -67,13 +66,11 @@ export default function Home() {
                 backgroundColor: 'black', // Background color changes to black on hover
                 color: 'white',           // Text color changes to white on hover
                 borderColor: 'black',     // Keep the border color black on hover
-              },
-            }}
-          >
+              },}}>
             Sign In
           </Button>
-
             </Link>
+            
           </SignedOut>
           <SignedIn>
             <UserButton />
