@@ -17,6 +17,7 @@ export default function PricingSection() {
       buttonText: "Get Started",
       backgroundColor: "#ffd3d9",
     },
+    
     {
       title: "Pro",
       price: "$1.99",
