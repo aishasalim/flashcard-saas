@@ -20,19 +20,28 @@ export default function Generate() {
       alert('Please enter some text to generate flashcards.');
       return;
     }
-
+  
     try {
       const response = await fetch('/api/generate', {
         method: 'POST',
         body: text,
       });
-
+  
       if (!response.ok) {
         throw new Error('Failed to generate flashcards');
       }
-
+  
       const data = await response.json();
-      setFlashcards(data.flashcards || []);
+      console.log('API response data:', data); // Check response format
+  
+      // Directly use the array if that's what you're receiving
+      if (Array.isArray(data)) {
+        console.log('Updating state with flashcards:', data); // Log data before setting state
+        setFlashcards(data);
+      } else {
+        console.error('Unexpected response format:', data);
+        alert('Unexpected response format. Please try again.');
+      }
     } catch (error) {
       console.error('Error generating flashcards:', error);
       alert('An error occurred while generating flashcards. Please try again.');

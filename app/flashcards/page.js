@@ -26,6 +26,7 @@ export default function Flashcard() {
     };
 
     useEffect(() => {
+        console.log('Flashcards state updated:', flashcards);
         async function getFlashcards() {
           // Replace `user.id` with a hardcoded user ID or remove it if not needed
           const userId = 'some-unique-user-id'; // Example: replace with an actual user ID or remove if not needed
@@ -39,7 +40,7 @@ export default function Flashcard() {
           }
         }
         getFlashcards();
-      }, []);
+      }, [flashcards]);
 
     return (
         <Container maxWidth="md">
