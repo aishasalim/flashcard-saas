@@ -1,4 +1,4 @@
-import { Container, Grid, Typography, TextField, Button, Link as MuiLink, Box } from '@mui/material';
+import { Container, Grid, Typography, Link as MuiLink, Box } from '@mui/material';
 
 export default function Footer() {
   return (

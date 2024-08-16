@@ -7,7 +7,11 @@ module.exports = {
   ],
   theme: {
     extend: {
-  
+      fontFamily: {
+        hyperlegible: ['"Atkinson Hyperlegible"', 'sans-serif'],
+        edu: ['"Edu VIC WA NT Beginner"', 'sans-serif'],
+        poppins: ['Poppins', 'sans-serif'],
+      },
     },
   },
   plugins: [],

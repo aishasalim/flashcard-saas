@@ -33,10 +33,18 @@ export default function PricingSection() {
 
   return (
     <Container maxWidth="lg" id="pricing" sx={{ my: 12 }}>
-      <Typography variant="h4" component="h2" sx={{ textAlign: 'center', fontWeight: 'bold', mb: 4 }}>
+      <Typography
+        variant="h4"
+        component="h2"
+        className="font-hyperlegible"
+        sx={{
+          textAlign: 'center',
+          fontWeight: 'bold',
+          mb: 4,
+        }} >
         Pick Your Plan
       </Typography>
-      <Typography variant="h6" component="p" sx={{ textAlign: 'center', color: 'text.secondary', mb: 6 }}>
+      <Typography variant="h6" component="p" className="font-poppins" sx={{ textAlign: 'center', color: 'text.secondary', mb: 6 }}>
         Choose the plan that <span style={{ color: '#ff69b4', fontWeight: 'bold' }}>best fits</span> your learning needs
       </Typography>
 
@@ -62,30 +70,34 @@ export default function PricingSection() {
               elevation={5}
             >
               <Stack alignItems={'center'}>
-                <Typography sx={{ fontSize: '1.8rem', fontWeight: 'bold', mb: 2 }} variant="h5">{plan.title}</Typography>
-                <Typography sx={{ fontSize: '3rem', fontWeight: 'bold', mb: 2 }} variant="h4">{plan.price}</Typography>
-                <Typography sx={{ fontSize: '1.2rem', color: 'text.secondary', mb: 4 }} variant="h6">{plan.description}</Typography>
+                <Typography sx={{ fontSize: '1.8rem', fontWeight: 'bold', mb: 2 }} variant="h5" className="font-edu">{plan.title}</Typography>
+                <Typography sx={{ fontSize: '3rem', fontWeight: 'bold', mb: 2 }} variant="h4" className="font-poppins">{plan.price}</Typography>
+                <Typography sx={{ fontSize: '1.2rem', color: 'text.secondary', mb: 4 }} variant="h6" className="font-edu">{plan.description}</Typography>
 
                 {plan.features.map((feature, i) => (
                   <Stack key={i} m={1} width={'100%'} justifyContent={'flex-start'} direction={'row'} alignItems={'center'}>
                     <CheckCircleIcon sx={{ mx: 2 }} />
-                    <Typography sx={{ flexGrow: 1, fontSize: '1rem' }}>{feature}</Typography>
+                    <Typography sx={{ flexGrow: 1, fontFamily: "'Edu VIC WA NT Beginner', sans-serif", fontSize: '1rem' }} className="font-poppins">{feature}</Typography>
                   </Stack>
                 ))}
 
                 <Link href={'/generate'} passHref style={{ width: '100%', textDecoration: 'none' }}>
-                <Button variant="contained" color="inherit"
+                  <Button
+                    variant="contained"
+                    color="inherit"
                     sx={{
-                        width: '100%',
-                        mt: 4,
-                        fontWeight: 'bold',
-                        backgroundColor: 'black',
-                        color: 'white',
-                        boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
-                        '&:hover': {
+                      width: '100%',
+                      mt: 4,
+                      fontWeight: 'bold',
+                      backgroundColor: 'black',
+                      color: 'white',
+                      boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+                      '&:hover': {
                         backgroundColor: 'black',
                         boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.3)',
-                        },}} href='sign-in'>
+                      },
+                    }}
+                  >
                     {plan.buttonText}
                   </Button>
                 </Link>
@@ -97,4 +109,3 @@ export default function PricingSection() {
     </Container>
   );
 }
-

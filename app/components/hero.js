@@ -1,5 +1,6 @@
 import React from 'react';
-import { Container, Box, Typography, Button, Link as MuiLink } from '@mui/material';
+import { Container, Box, Typography, Button } from '@mui/material';
+import Link from 'next/link';
 
 export default function HeroSection() {
   return (
@@ -9,23 +10,27 @@ export default function HeroSection() {
           Transform Your Learning with AI-Powered Flashcards
         </Typography>
         <Typography variant="h6" component="h2" gutterBottom sx={{ color: 'text.secondary' }}>
-        <span style={{ color: '#ff69b4', fontWeight: 'bold' }}>AI-generated flashcards</span> that adapt to your needs and help you retain information <span style={{ color: '#ff69b4', fontWeight: 'bold' }}>more effectively</span>
+          <span style={{ color: '#ff69b4', fontWeight: 'bold' }}>AI-generated flashcards</span> that adapt to your needs and help you retain information <span style={{ color: '#ff69b4', fontWeight: 'bold' }}>more effectively</span>
         </Typography>
-        <Button variant="contained" color="inherit"
+        <Link href="/sign-in" passHref>
+          <Button variant="contained" color="inherit"
             sx={{
-                mt: 4,
-                mx: 4,
-                fontWeight: 'bold',
-                backgroundColor: 'black',
-                color: 'white',
-                boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
-                '&:hover': {
+              mt: 4,
+              mx: 4,
+              fontWeight: 'bold',
+              backgroundColor: 'black',
+              color: 'white',
+              boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+              '&:hover': {
                 backgroundColor: 'black',
                 boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.3)',
-                },}} href='sign-in'>
-          Get Started
-        </Button>
-        <Button variant="outlined"
+              },
+            }}>
+            Get Started
+          </Button>
+        </Link>
+        <Link href="/generate" passHref>
+          <Button variant="outlined"
             sx={{
               mt: 4,
               mx: 4,
@@ -37,9 +42,11 @@ export default function HeroSection() {
                 backgroundColor: 'black', // Background color changes to black on hover
                 color: 'white',           // Text color changes to white on hover
                 borderColor: 'black',     // Keep the border color black on hover
-              },}}>
+              },
+            }}>
             Generate Cards
           </Button>
+        </Link>
       </Box>
     </Container>
   );

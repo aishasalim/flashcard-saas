@@ -5,6 +5,7 @@ import { Container, TextField, Button, Typography, Box, Grid, Card, CardContent,
 import { doc, collection, getDoc, writeBatch } from 'firebase/firestore';
 import { db } from '../firebase'; // Ensure this import is correct
 import { getStripe } from '/utils/get-stripe';
+import Navbar from '../components/navbar';
 
 export default function Generate() {
   const [text, setText] = useState('');
@@ -83,6 +84,8 @@ export default function Generate() {
   };
 
   return (
+    <>
+    <Navbar />
     <Container maxWidth="md">
       <Box sx={{ my: 4 }}>
         <Typography variant="h4" component="h1" gutterBottom>
@@ -103,9 +106,39 @@ export default function Generate() {
           color="primary"
           onClick={handleSubmit}
           fullWidth
+          sx={{
+            fontWeight: 'bold',
+            backgroundColor: 'black',
+            color: 'white',
+            boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+            '&:hover': {
+            backgroundColor: 'black',
+            boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.3)',
+            },}}
         >
           Generate Flashcards
         </Button>
+
+        {flashcards.length > 0 && (
+        <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+          <Button 
+            variant="contained" 
+            color="primary" 
+            onClick={handleOpenDialog}  
+            fullWidth
+            sx={{
+              fontWeight: 'bold',
+              backgroundColor: 'black',
+              color: 'white',
+              boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+              '&:hover': {
+              backgroundColor: 'black',
+              boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.3)',
+              },}}>
+            Save Flashcards
+          </Button>
+        </Box>
+      )}
       </Box>
 
       {flashcards.length > 0 && (
@@ -127,14 +160,6 @@ export default function Generate() {
               </Grid>
             ))}
           </Grid>
-        </Box>
-      )}
-
-      {flashcards.length > 0 && (
-        <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-          <Button variant="contained" color="primary" onClick={handleOpenDialog}>
-            Save Flashcards
-          </Button>
         </Box>
       )}
 
@@ -162,5 +187,6 @@ export default function Generate() {
         </DialogActions>
       </Dialog>
     </Container>
+  </>
   );
 }
