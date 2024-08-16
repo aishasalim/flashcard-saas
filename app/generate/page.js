@@ -1,10 +1,10 @@
-'use client'
+'use client';
 
 import React, { useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { collection, doc, getDoc, writeBatch } from 'firebase/firestore';
-import { db } from '../firebase';
+import { db } from '../firebase'; // Ensure this import is correct
 import {
   Container,
   TextField,
@@ -18,7 +18,6 @@ import {
   DialogActions,
   Grid,
   Card,
-  CardActionArea,
   CardContent,
 } from '@mui/material';
 import Navbar from '../components/navbar'; // Ensure this import is correct
@@ -55,14 +54,21 @@ export default function Generate() {
 
         const data = await response.json();
         console.log('Generated flashcards:', data); // Log the data to check structure
-        setFlashcards(data.flashcards || []); // Ensure to use data.flashcards
-        console.log('Flashcards state updated:', data.flashcards || []);
+        
+        if (Array.isArray(data)) {
+            setFlashcards(data); // Ensure to use data directly if it's an array
+        } else if (data.flashcards) {
+            setFlashcards(data.flashcards); // Ensure to use data.flashcards if it's an object
+        } else {
+            console.error('Unexpected response format:', data);
+            alert('Unexpected response format. Please try again.');
+        }
+        
     } catch (error) {
         console.error('Error generating flashcards:', error);
         alert('An error occurred while generating flashcards. Please try again.');
     }
-};
-
+  };
 
   const saveFlashcards = async () => {
       if (!setName.trim()) {
@@ -139,6 +145,28 @@ export default function Generate() {
                     >
                         Generate Flashcards
                     </Button>
+
+                    {flashcards.length > 0 && (
+                        <Box sx={{ mt: 4 }}>
+                            <Typography variant="h5" component="h2" gutterBottom>
+                                Generated Flashcards
+                            </Typography>
+                            <Grid container spacing={2}>
+                                {flashcards.map((flashcard, index) => (
+                                    <Grid item xs={12} sm={6} md={4} key={index}>
+                                        <Card>
+                                            <CardContent>
+                                                <Typography variant="h6">Front:</Typography>
+                                                <Typography>{flashcard.front}</Typography>
+                                                <Typography variant="h6" sx={{ mt: 2 }}>Back:</Typography>
+                                                <Typography>{flashcard.back}</Typography>
+                                            </CardContent>
+                                        </Card>
+                                    </Grid>
+                                ))}
+                            </Grid>
+                        </Box>
+                    )}
 
                     {flashcards.length > 0 && (
                         <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
