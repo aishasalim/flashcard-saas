@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Container, TextField, Button, Typography, Box, Grid, Card, CardContent, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import { doc, collection, getDoc, writeBatch } from 'firebase/firestore';
 import { db } from '../firebase'; // Ensure this import is correct
-import { getStripe } from 'path-to-your-stripe-utils';
+import { getStripe } from '/utils/get-stripe';
 
 export default function Generate() {
   const [text, setText] = useState('');

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Container, Box, Typography, AppBar, Toolbar, Button } from '@mui/material'
-import { SignInS} from '@clerk/nextjs'
+import { SignIn } from '@clerk/nextjs'
 import Link from 'next/link'
 
 export default function SignUpSPage() {
@@ -35,7 +35,7 @@ export default function SignUpSPage() {
         <Typography variant="h4" component="h1" gutterBottom>
           Sign In
         </Typography>
-        <SignIn />
+        <SignIn/>
       </Box>
       </Container>
     </>
