@@ -26,21 +26,19 @@ export default function Flashcard() {
     };
 
     useEffect(() => {
-        console.log('Flashcards state updated:', flashcards);
-        async function getFlashcards() {
-          // Replace `user.id` with a hardcoded user ID or remove it if not needed
-          const userId = 'some-unique-user-id'; // Example: replace with an actual user ID or remove if not needed
-          const docRef = doc(collection(db, 'users'), userId);
-          const docSnap = await getDoc(docRef);
-          if (docSnap.exists()) {
-            const collections = docSnap.data().flashcards || [];
-            setFlashcards(collections);
-          } else {
-            await setDoc(docRef, { flashcards: [] });
-          }
+      async function getFlashcards() {
+        const userId = 'some-unique-user-id'; // Replace with actual user ID or authentication
+        const docRef = doc(collection(db, 'users'), userId);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const collections = docSnap.data().flashcards || [];
+          setFlashcards(collections);
+        } else {
+          await setDoc(docRef, { flashcards: [] });
         }
-        getFlashcards();
-      }, [flashcards]);
+      }
+      getFlashcards();
+    }, []);
 
     return (
         <Container maxWidth="md">

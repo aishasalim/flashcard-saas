@@ -15,7 +15,7 @@ Return in the following JSON format:
 `;
 
 export async function POST(req) {
-  const apiKey = process.env.OPEN_AI_API_KEY;
+  const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
   if (!apiKey) {
     console.error('API key is missing');
     return new Response('API key is missing', { status: 500 });
@@ -31,7 +31,7 @@ export async function POST(req) {
         { role: 'system', content: systemPrompt },
         { role: 'user', content: data },
       ],
-      model: 'gpt-4o',
+      model: 'gpt-3.5-turbo',
     });
 
     console.log('Completion response:', completion);
