@@ -32,6 +32,7 @@ export default function Generate() {
 
   const handleOpenDialog = () => setDialogOpen(true);
   const handleCloseDialog = () => setDialogOpen(false);
+  const colors = ['#cdeffb', '#ffccd2', '#ffffaf', '#e6dbff']; 
 
   const handleSubmit = async () => {
     if (!text.trim()) {
@@ -147,28 +148,6 @@ export default function Generate() {
                     </Button>
 
                     {flashcards.length > 0 && (
-                        <Box sx={{ mt: 4 }}>
-                            <Typography variant="h5" component="h2" gutterBottom>
-                                Generated Flashcards
-                            </Typography>
-                            <Grid container spacing={2}>
-                                {flashcards.map((flashcard, index) => (
-                                    <Grid item xs={12} sm={6} md={4} key={index}>
-                                        <Card>
-                                            <CardContent>
-                                                <Typography variant="h6">Front:</Typography>
-                                                <Typography>{flashcard.front}</Typography>
-                                                <Typography variant="h6" sx={{ mt: 2 }}>Back:</Typography>
-                                                <Typography>{flashcard.back}</Typography>
-                                            </CardContent>
-                                        </Card>
-                                    </Grid>
-                                ))}
-                            </Grid>
-                        </Box>
-                    )}
-
-                    {flashcards.length > 0 && (
                         <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
                             <Button
                                 variant="contained"
@@ -190,7 +169,26 @@ export default function Generate() {
                             </Button>
                         </Box>
                     )}
-                </Box>
+
+              {flashcards.length > 0 && (
+                <Box sx={{ mt: 4 }}>
+                  <Typography variant="h5" component="h2" gutterBottom>Generated Flashcards</Typography>
+                  <Grid container spacing={2}>
+                    {flashcards.map((flashcard, index) => (
+                      <Grid item xs={12} sm={6} md={4} key={index}>
+                        <Card sx={{ backgroundColor: colors[index % colors.length] }}>
+                          <CardContent>
+                            <Typography variant="h6">Front:</Typography>
+                              <Typography>{flashcard.front}</Typography>
+                              <Typography variant="h6" sx={{ mt: 2 }}>Back:</Typography>
+                              <Typography>{flashcard.back}</Typography>
+                              </CardContent>
+                        </Card>
+                      </Grid>
+                    ))}
+                </Grid>
+              </Box>)}
+            </Box>
 
                 <Dialog open={dialogOpen} onClose={handleCloseDialog}>
                     <DialogTitle>Save Flashcard Set</DialogTitle>
@@ -209,8 +207,26 @@ export default function Generate() {
                         />
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={handleCloseDialog}>Cancel</Button>
-                        <Button onClick={saveFlashcards} color="primary">
+                        <Button onClick={handleCloseDialog} 
+                          sx={{
+                          fontWeight: 'bold',
+                          backgroundColor: 'black',
+                          color: 'white',
+                          boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+                          '&:hover': {
+                            backgroundColor: 'black',
+                            boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.3)',
+                          },}}>Cancel</Button>
+                        <Button onClick={saveFlashcards} color="primary" 
+                          sx={{
+                          fontWeight: 'bold',
+                          backgroundColor: 'black',
+                          color: 'white',
+                          boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+                          '&:hover': {
+                            backgroundColor: 'black',
+                            boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.3)',
+                          },}}>
                             Save
                         </Button>
                     </DialogActions>

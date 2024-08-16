@@ -15,7 +15,7 @@ export default function PricingSection() {
         "Limited saved flashcard sets",
       ],
       buttonText: "Get Started",
-      backgroundColor: "#ffd3d9",
+      backgroundColor: "#e6dbff",
     },
     
     {
@@ -28,7 +28,7 @@ export default function PricingSection() {
         "Unlimited saved flashcard sets",
       ],
       buttonText: "Upgrade to Pro",
-      backgroundColor: "#d0f0fd",
+      backgroundColor: "#ffd3d9",
     },
   ];
 
@@ -43,10 +43,10 @@ export default function PricingSection() {
           fontWeight: 'bold',
           mb: 4,
         }} >
-        Pick Your Plan
+        Choose Your Plan
       </Typography>
       <Typography variant="h6" component="p" className="font-poppins" sx={{ textAlign: 'center', color: 'text.secondary', mb: 6 }}>
-        Choose the plan that <span style={{ color: '#ff69b4', fontWeight: 'bold' }}>best fits</span> your learning needs
+        Choose the plan that <span style={{ color: '#ff69b4', fontWeight: 'bold' }}>perfectly fits</span> your learning goals
       </Typography>
 
       <Grid container spacing={10} justifyContent="center">
@@ -71,14 +71,14 @@ export default function PricingSection() {
               elevation={5}
             >
               <Stack alignItems={'center'}>
-                <Typography sx={{ fontSize: '1.8rem', fontWeight: 'bold', mb: 2 }} variant="h5" className="font-edu">{plan.title}</Typography>
+                <Typography sx={{ fontSize: '1.8rem', fontWeight: 'bold', mb: 2 }} variant="h5" className="font-poppins">{plan.title}</Typography>
                 <Typography sx={{ fontSize: '3rem', fontWeight: 'bold', mb: 2 }} variant="h4" className="font-poppins">{plan.price}</Typography>
-                <Typography sx={{ fontSize: '1.2rem', color: 'text.secondary', mb: 4 }} variant="h6" className="font-edu">{plan.description}</Typography>
+                <Typography sx={{ fontSize: '1.2rem', color: 'text.secondary', mb: 4 }} variant="h6" className="font-poppins">{plan.description}</Typography>
 
                 {plan.features.map((feature, i) => (
                   <Stack key={i} m={1} width={'100%'} justifyContent={'flex-start'} direction={'row'} alignItems={'center'}>
                     <CheckCircleIcon sx={{ mx: 2 }} />
-                    <Typography sx={{ flexGrow: 1, fontFamily: "'Edu VIC WA NT Beginner', sans-serif", fontSize: '1rem' }} className="font-poppins">{feature}</Typography>
+                    <Typography sx={{ flexGrow: 1, fontFamily: "'Edu VIC WA NT Beginner', sans-serif", fontSize: '1.3rem' }} className="font-edu">{feature}</Typography>
                   </Stack>
                 ))}
 

@@ -4,10 +4,13 @@ import { AppBar, Toolbar, Box, Typography, Button, Link as MuiLink } from '@mui/
 import { SignedOut, SignedIn, UserButton } from '@clerk/nextjs';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
+import { useUser } from '@clerk/nextjs';
+
 
 const Navbar = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { isSignedIn } = useUser(); // Check if the user is signed in
 
   return (
     <AppBar position="static" color="transparent" elevation={0}>
@@ -57,7 +60,7 @@ const Navbar = () => {
               PRICING
             </Link>
             <Link
-              href="/dashboard"
+              href={isSignedIn ? "/dashboard" : "/sign-in"}
               color="inherit"
               underline="none"
               sx={{

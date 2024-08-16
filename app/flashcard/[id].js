@@ -1,28 +1,37 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../firebase';
 
 export default function FlashcardSet() {
   const router = useRouter();
-  const { id, flashcards } = router.query; // `id` corresponds to the flashcard set ID
+  const { id } = router.query; // Get the flashcard set ID from the URL
 
-  // Parse the flashcards if passed as a query string
-  const [parsedFlashcards, setParsedFlashcards] = useState([]);
+  const [flashcards, setFlashcards] = useState([]);
 
   useEffect(() => {
-    if (flashcards) {
-      try {
-        setParsedFlashcards(JSON.parse(flashcards));
-      } catch (error) {
-        console.error('Error parsing flashcards:', error);
+    const fetchFlashcards = async () => {
+      if (id) {
+        const flashcardsCollectionRef = collection(db, `users/${userId}/flashcardSets/${id}/flashcards`);
+        const flashcardsSnapshot = await getDocs(flashcardsCollectionRef);
+
+        const flashcardsData = flashcardsSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        setFlashcards(flashcardsData);
       }
-    }
-  }, [flashcards]);
+    };
+
+    fetchFlashcards();
+  }, [id]);
 
   return (
     <div>
       <h1>Flashcard Set: {id}</h1>
-      {parsedFlashcards.length > 0 ? (
-        parsedFlashcards.map((flashcard, index) => (
+      {flashcards.length > 0 ? (
+        flashcards.map((flashcard, index) => (
           <div key={index}>
             <p><strong>Front:</strong> {flashcard.front}</p>
             <p><strong>Back:</strong> {flashcard.back}</p>
@@ -34,4 +43,3 @@ export default function FlashcardSet() {
     </div>
   );
 }
-
