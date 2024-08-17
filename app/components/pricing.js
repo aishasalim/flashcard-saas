@@ -1,9 +1,39 @@
+
+'use client';
+
 import React from 'react';
-import { Container, Typography, Grid, Stack, Paper, Button, Box } from '@mui/material';
+import { Container, Typography, Grid, Stack, Paper, Button } from '@mui/material';
 import Link from 'next/link';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { useRouter } from 'next/navigation';
 
 export default function PricingSection() {
+  const router = useRouter();
+
+  const handleSubmit = async () => {
+    try {
+      const response = await fetch('/api/checkout_sessions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || 'An error occurred');
+      }
+
+      const session = await response.json();
+
+      // Redirect to Stripe Checkout
+      router.push(session.url);
+    } catch (error) {
+      console.error('Error in handleSubmit:', error);
+      alert('An error occurred while processing your request. Please try again.');
+    }
+  };
+
   const pricing = [
     {
       title: "Basic",
@@ -16,12 +46,12 @@ export default function PricingSection() {
       ],
       buttonText: "Get Started",
       backgroundColor: "#e6dbff",
+      isFree: true
     },
-    
     {
       title: "Pro",
-      price: "$1.99",
-      description: "One time payment",
+      price: "$10",
+      description: "Per month",
       features: [
         "Exclusive content and features",
         "Unlimited flashcard generation",
@@ -29,6 +59,7 @@ export default function PricingSection() {
       ],
       buttonText: "Upgrade to Pro",
       backgroundColor: "#ffd3d9",
+      isFree: false
     },
   ];
 
@@ -82,10 +113,32 @@ export default function PricingSection() {
                   </Stack>
                 ))}
 
-                <Link href={'/generate'} passHref style={{ width: '100%', textDecoration: 'none' }}>
+                {plan.isFree ? (
+                  <Link href={'/generate'} passHref style={{ width: '100%', textDecoration: 'none' }}>
+                    <Button
+                      variant="contained"
+                      color="inherit"
+                      sx={{
+                        width: '100%',
+                        mt: 4,
+                        fontWeight: 'bold',
+                        backgroundColor: 'black',
+                        color: 'white',
+                        boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+                        '&:hover': {
+                          backgroundColor: 'black',
+                          boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.3)',
+                        },
+                      }}
+                    >
+                      {plan.buttonText}
+                    </Button>
+                  </Link>
+                ) : (
                   <Button
                     variant="contained"
                     color="inherit"
+                    onClick={handleSubmit}
                     sx={{
                       width: '100%',
                       mt: 4,
@@ -101,7 +154,7 @@ export default function PricingSection() {
                   >
                     {plan.buttonText}
                   </Button>
-                </Link>
+                )}
               </Stack>
             </Paper>
           </Grid>
