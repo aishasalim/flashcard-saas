@@ -12,7 +12,7 @@ import Navbar from "../components/navbar";
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
 import CircularProgress from '@mui/material/CircularProgress';
-
+тз
 
 const FlashcardBox = styled(Box)(({ theme, isFlipped }) => ({
   backgroundColor: '#E6F7FF',
