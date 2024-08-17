@@ -20,7 +20,7 @@ export default function ProductSection() {
         <Grid item xs={12} md={6}>
           <Grid container spacing={2} direction="column">
             {[
-              { title: "Create a new study set", description: "Enter a title and prompt, then click 'Create' to start a new study set.", bgColor: '#cdeffb', number: "01" },
+              { title: "Create a new study set", description: "Enter a title and prompt, then click Create to start a new study set.", bgColor: '#cdeffb', number: "01" },
               { title: "Generate Flashcards", description: "Provide a topic to generate AI-powered flashcards instantly.", bgColor: '#ffccd2', number: "02" },
               { title: "Review and Edit", description: "Review the flashcards and make any edits as needed.", bgColor: '#ffffaf', number: "03" },
               { title: "Save the Study Set", description: "Save your finalized study set to your account.", bgColor: '#e6dbff', number: "04" }

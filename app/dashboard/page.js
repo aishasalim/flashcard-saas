@@ -11,6 +11,8 @@ import { useUser } from "@clerk/nextjs";
 import Navbar from "../components/navbar";
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
+import CircularProgress from '@mui/material/CircularProgress';
+
 
 const FlashcardBox = styled(Box)(({ theme, isFlipped }) => ({
   backgroundColor: '#E6F7FF',
@@ -121,6 +123,7 @@ export default function Dashboard() {
   const [correctCards, setCorrectCards] = useState(0);
   const [incorrectCards, setIncorrectCards] = useState([]); // State to track incorrectly answered cards
   const [flippedStates, setFlippedStates] = useState(Array(incorrectCards.length).fill(false));
+  const [loading, setLoading] = useState(true);
 
   const handleFlip = (index) => {
     const newFlippedStates = [...flippedStates];
@@ -144,6 +147,7 @@ export default function Dashboard() {
           ...doc.data(),
         }));
         setUserFlashCards(flashcardSets);
+        setLoading(false); 
       }
     };
 
@@ -218,7 +222,7 @@ export default function Dashboard() {
                   </Grid>
                 ))}
               </Grid>
-
+  
               <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 4 }}>
                 <Button
                   variant="outlined"
@@ -303,6 +307,10 @@ export default function Dashboard() {
             </>
           )}
         </Container>
+      ) : loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+          <CircularProgress />
+        </Box>
       ) : (
         <Container sx={{ mt: 5, py: 5, maxWidth: "xl" }} maxWidth={false}>
           <Stack direction={'row'} justifyContent={'space-between'}>
