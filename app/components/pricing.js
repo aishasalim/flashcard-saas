@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -45,7 +44,7 @@ export default function PricingSection() {
         "Limited saved flashcard sets",
       ],
       buttonText: "Get Started",
-      backgroundColor: "#e6dbff",
+      backgroundColor: "#d8c7ff",
       isFree: true
     },
     {
@@ -58,7 +57,7 @@ export default function PricingSection() {
         "Unlimited saved flashcard sets",
       ],
       buttonText: "Upgrade to Pro",
-      backgroundColor: "#ffd3d9",
+      backgroundColor: "#a6e7ff",
       isFree: false
     },
   ];
@@ -68,30 +67,32 @@ export default function PricingSection() {
       <Typography
         variant="h4"
         component="h2"
-        className="font-hyperlegible"
         sx={{
           textAlign: 'center',
           fontWeight: 'bold',
           mb: 4,
-        }} >
-        Choose Your Plan
+        }}
+      >
+        Select Your Ideal Plan
       </Typography>
-      <Typography variant="h6" component="p" className="font-poppins" sx={{ textAlign: 'center', color: 'text.secondary', mb: 6 }}>
-        Choose the plan that <span style={{ color: '#ff69b4', fontWeight: 'bold' }}>perfectly fits</span> your learning goals
+      <Typography variant="h6" component="p" sx={{ textAlign: 'center', color: 'text.secondary', mb: 6 }}>
+        Find the plan that <span style={{ color: '#ffa4a3', fontWeight: 'bold' }}>best suits</span> your learning needs
       </Typography>
 
-      <Grid container spacing={10} justifyContent="center">
+      <Grid container spacing={4} justifyContent="center">
         {pricing.map((plan, index) => (
-          <Grid item xs={12} sm={8} md={5} key={index}>
+          <Grid item xs={12} sm={6} md={4} key={index}>
             <Paper
               sx={{
                 width: '100%',
-                maxWidth: '400px',
+                maxWidth: '360px',
                 minHeight: '480px',
                 backgroundColor: plan.backgroundColor,
-                transition: 'transform 0.3s ease',
+                borderRadius: '16px',
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
                 '&:hover': {
-                  transform: 'rotate(-3deg)',
+                  transform: 'scale(1.05)',
+                  boxShadow: '0px 15px 30px rgba(0, 0, 0, 0.2)',
                 },
                 margin: 'auto',
                 padding: 4,
@@ -102,14 +103,14 @@ export default function PricingSection() {
               elevation={5}
             >
               <Stack alignItems={'center'}>
-                <Typography sx={{ fontSize: '1.8rem', fontWeight: 'bold', mb: 2 }} variant="h5" className="font-poppins">{plan.title}</Typography>
-                <Typography sx={{ fontSize: '3rem', fontWeight: 'bold', mb: 2 }} variant="h4" className="font-poppins">{plan.price}</Typography>
-                <Typography sx={{ fontSize: '1.2rem', color: 'text.secondary', mb: 4 }} variant="h6" className="font-poppins">{plan.description}</Typography>
+                <Typography sx={{ fontSize: '1.5rem', fontWeight: 'bold', mb: 1 }} variant="h5">{plan.title}</Typography>
+                <Typography sx={{ fontSize: '2.5rem', fontWeight: 'bold', mb: 1 }} variant="h4">{plan.price}</Typography>
+                <Typography sx={{ fontSize: '1rem', color: 'text.secondary', mb: 4 }} variant="h6">{plan.description}</Typography>
 
                 {plan.features.map((feature, i) => (
                   <Stack key={i} m={1} width={'100%'} justifyContent={'flex-start'} direction={'row'} alignItems={'center'}>
-                    <CheckCircleIcon sx={{ mx: 2 }} />
-                    <Typography sx={{ flexGrow: 1, fontFamily: "'Edu VIC WA NT Beginner', sans-serif", fontSize: '1.3rem' }} className="font-edu">{feature}</Typography>
+                    <CheckCircleIcon sx={{ mx: 2, color: '#4caf50' }} />
+                    <Typography sx={{ flexGrow: 1, fontSize: '1.2rem' }}>{feature}</Typography>
                   </Stack>
                 ))}
 
@@ -117,7 +118,6 @@ export default function PricingSection() {
                   <Link href={'/generate'} passHref style={{ width: '100%', textDecoration: 'none' }}>
                     <Button
                       variant="contained"
-                      color="inherit"
                       sx={{
                         width: '100%',
                         mt: 4,
@@ -137,7 +137,6 @@ export default function PricingSection() {
                 ) : (
                   <Button
                     variant="contained"
-                    color="inherit"
                     onClick={handleSubmit}
                     sx={{
                       width: '100%',
