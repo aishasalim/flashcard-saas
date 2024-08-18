@@ -20,15 +20,17 @@ import {
   CardContent,
   CircularProgress, // Import CircularProgress for the loading animation
 } from '@mui/material';
-import Navbar from '../components/navbar'; // Ensure this import is correct
+import Navbar from '../components/navbar'; 
 
 export default function Generate() {
   const [text, setText] = useState('');
   const [flashcards, setFlashcards] = useState([]);
   const [setName, setSetName] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
+
   const [flipIndex, setFlipIndex] = useState(null); // Manage flip state
   const [loading, setLoading] = useState(false); // Loading state
+
   const { user } = useUser();
   const router = useRouter();
   

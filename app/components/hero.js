@@ -9,12 +9,13 @@ export default function HeroSection() {
   return (
     <Container maxWidth="lg">
       <Box sx={{ textAlign: 'center', my: 20 }}>
-        <Typography variant="h2" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
-          Revolutionize Your Learning with AI Flashcards
-        </Typography>
-        <Typography variant="h6" component="h2" gutterBottom sx={{ color: 'text.secondary' }}>
-          <span style={{ color: '#ff69b4', fontWeight: 'bold' }}>AI-generated flashcards</span> that will help you study <span style={{ color: '#ff69b4', fontWeight: 'bold' }}>more effectively</span>
-        </Typography>
+      <Typography variant="h2" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
+        Transform Your Study Routine with AI-Generated Flashcards
+      </Typography>
+      <Typography variant="h6" component="h2" gutterBottom sx={{ color: 'text.secondary' }}>
+        Experience <span style={{ color: '#ffa4a3', fontWeight: 'bold' }}>personalized flashcards</span> designed to help you <span style={{ color: '#ffa4a3', fontWeight: 'bold' }}>study smarter</span> and <span style={{ color: '#ffa4a3', fontWeight: 'bold' }}>retain information longer</span>.
+      </Typography>
+
 
         {!isSignedIn && (
           <Link href="/sign-in" passHref>

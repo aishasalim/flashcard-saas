@@ -36,13 +36,13 @@ const Navbar = () => {
                   textTransform: 'none',
                   fontFamily: "'Poppins', sans-serif",
                   borderRadius: '5px',
-                  px: '10px', // Horizontal padding
-                  py: '5px', // Optional: Vertical padding
-                  transition: 'color 0.3s, background-color 0.3s, box-shadow 0.3s', // Smooth transition
+                  px: '10px', 
+                  py: '5px', 
+                  transition: 'color 0.3s, background-color 0.3s, box-shadow 0.3s', 
                   '&:hover': {
-                    color: 'rgb(255, 99, 132)', // Pastel red text
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)', // Slight pastel red background
-                    boxShadow: '0 0 10px rgba(255, 99, 132, 0.7)', // Pastel red glow
+                    color: 'rgb(255, 99, 132)', 
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)', 
+                    boxShadow: '0 0 10px rgba(255, 99, 132, 0.7)', 
                   },
                 }}
               >
