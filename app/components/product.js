@@ -65,7 +65,7 @@ export default function ProductSection() {
     { 
       title: "Generate Flashcards", 
       description: "Provide a topic, and our AI will generate personalized flashcards for you.", 
-      color: '#b3f9c6', // Pastel green
+      color: '#92e0a7', // Pastel green
       number: "02" 
     },
     { 
@@ -101,7 +101,7 @@ export default function ProductSection() {
   return (
     <Container maxWidth="lg" id="product" sx={{ my: 20, color: 'black' }}>
       <Grid container spacing={4} alignItems="center">
-        <Grid item xs={12} md={6}>
+        <Grid  xs={12} md={6} item>
         <Typography
         variant="h4"
         sx={{
@@ -128,7 +128,7 @@ export default function ProductSection() {
         Save them as study sets when logged in, and easily manage, adjust, or update the cards to fit your needs.
       </Typography>
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid xs={12} md={6} item >
           <Box sx={{ position: 'relative', height: 300 }}>
             {slides.map((item, index) => (
               <Box
@@ -137,6 +137,7 @@ export default function ProductSection() {
                   position: 'absolute',
                   top: 0,
                   left: 0,
+                  my: 6,
                   width: '100%',
                   opacity: currentSlide === index ? 1 : 0,
                   transition: 'opacity 0.5s ease-in-out',

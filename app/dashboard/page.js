@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Container, Typography, Button, Box, IconButton, Stack, Grid, Paper } from "@mui/material";
+import { Container, Typography, Button, Box, IconButton, Stack, Grid, CardContent, Paper } from "@mui/material";
 import Link from "next/link";
 import { styled } from "@mui/system";
 import { useEffect, useState } from "react";
@@ -12,9 +12,11 @@ import Navbar from "../components/navbar";
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
 import CircularProgress from '@mui/material/CircularProgress';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { doc, deleteDoc } from "firebase/firestore";
 
-const FlashcardBox = styled(Box)(({ theme, isFlipped }) => ({
-  backgroundColor: '#E6F7FF',
+const FlashcardBox = styled(Box)(({ theme, isFlipped, cardColor }) => ({
+  backgroundColor: cardColor,
   width: '100%',
   maxWidth: '700px',
   minHeight: '400px',
@@ -29,7 +31,7 @@ const FlashcardBox = styled(Box)(({ theme, isFlipped }) => ({
   fontFamily: "'Comic Sans MS', sans-serif",
   transformStyle: 'preserve-3d',
   transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
-  transition: 'transform 0.6s',
+  transition: 'transform 0.6s, background-color 0.6s', // Added background-color transition
 }));
 
 const FlashcardContent = styled(Box)(({ theme, isFlipped, side }) => ({
@@ -73,66 +75,17 @@ const StyledPaper = styled(Paper)(({ rotate, cardColor, crossed }) => ({
     : {},
 }));
 
-const FlippableCard = styled(Box)(({ isFlipped }) => ({
-  marginTop: '1.5em',
-  width: '100%',
-  height: '100%',
-  position: 'relative',
-  transformStyle: 'preserve-3d',
-  transition: 'transform 0.6s',
-  transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
-  display: 'flex',  // Added to make sure the card is displayed as a block
-  justifyContent: 'center',  // Center content horizontally
-  alignItems: 'center',  // Center content vertically
-}));
-
-const FlippableCardFront = styled(Box)({
-  marginTop: '1.5em',
-  position: 'absolute',
-  width: '100%',
-  height: '100%',
-  backfaceVisibility: 'hidden',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  fontSize: '18px',
-});
-
-const FlippableCardBack = styled(Box)({
-  position: 'absolute',
-  width: '100%',
-  height: '100%',
-  backfaceVisibility: 'hidden',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  fontSize: '18px',
-  transform: 'rotateY(180deg)',
-});
-
-
-
 export default function Dashboard() {
   const [userFlashCards, setUserFlashCards] = useState([]);
   const [selectedCard, setSelectedCard] = useState(null); // State for selected card set
   const [currentCardIndex, setCurrentCardIndex] = useState(0); // State to track current flashcard index
   const { user } = useUser();
-  const colors = ['#cdeffb', '#ffccd2', '#ffffaf', '#e6dbff']; 
+  const colors = ['#ffa4a3', '#b3f9c6', '#a6e7ff', '#e6dbff'];
   const [isFlipped, setIsFlipped] = useState(false);
+  const [flipIndex, setFlipIndex] = useState(null); // Manage flip state
   const [correctCards, setCorrectCards] = useState(0);
   const [incorrectCards, setIncorrectCards] = useState([]); // State to track incorrectly answered cards
-  const [flippedStates, setFlippedStates] = useState(Array(incorrectCards.length).fill(false));
   const [loading, setLoading] = useState(true);
-
-  const handleFlip = (index) => {
-    const newFlippedStates = [...flippedStates];
-    newFlippedStates[index] = !newFlippedStates[index];
-    setFlippedStates(newFlippedStates);
-  };
-
-  const handleCardFlip = () => {
-    setIsFlipped(!isFlipped);
-  };
 
   useEffect(() => {
     const fetchFlashcards = async () => {
@@ -163,11 +116,12 @@ export default function Dashboard() {
 
   const handleBackClick = () => {
     if (selectedCard !== null) {
-      setIncorrectCards((prev) => [...prev, currentCardIndex]); // Track the current card as incorrect
+      const currentFlashcard = userFlashCards[selectedCard].flashcards[currentCardIndex];
+      setIncorrectCards((prev) => [...prev, currentFlashcard]); // Track the entire flashcard as incorrect
       handleNextCard(); // Move to the next card
     }
   };
-
+  
   const handleNextCard = () => {
     if (selectedCard !== null) {
       if (currentCardIndex < userFlashCards[selectedCard].flashcards.length - 1) {
@@ -180,7 +134,20 @@ export default function Dashboard() {
     }
   };
   
-
+  const handleDeleteSet = async (setId) => {
+    if (user) {
+      const userId = user.id;
+      const flashcardSetDocRef = doc(db, `users/${userId}/flashcardSets`, setId);
+  
+      try {
+        await deleteDoc(flashcardSetDocRef);
+        setUserFlashCards(prev => prev.filter(set => set.id !== setId)); // Update the state to remove the deleted set
+      } catch (error) {
+        console.error("Error deleting flashcard set: ", error);
+      }
+    }
+  };
+  
   const handleCorrectCard = () => {
     if (selectedCard !== null) {
       setCorrectCards((prev) => prev + 1);
@@ -188,62 +155,144 @@ export default function Dashboard() {
     }
   };
 
+  const handleCardFlip = () => {
+    setIsFlipped(!isFlipped); // Toggle the flip state
+  };  
+
+  const handleIncorrectCardFlip = (index) => {
+    setFlipIndex(flipIndex === index ? null : index);
+  };
+
   return (
     <>
       <Navbar />
       {selectedCard !== null ? (
         <Container sx={{ my: 7, textAlign: 'center' }} maxWidth={false}>
-          {currentCardIndex >= userFlashCards[selectedCard].flashcards.length ? (
-            <>
-              <Typography variant="h4" sx={{ mt: 5 }} className="font-poppins">
-                {incorrectCards.length} out of {userFlashCards[selectedCard].flashcards.length} cards were marked as skipped.
-              </Typography>
-              <Typography variant="h6" sx={{ mb: 4 }} className="font-poppins">
-                Focus on these flashcards, you had trouble with them.
-              </Typography>
-              <Grid container spacing={2} justifyContent="center">
-                {incorrectCards.map((index, cardIdx) => (
-                  <Grid item xs={12} sm={6} md={4} key={index}>
-                    <StyledPaper cardColor={colors[index % colors.length]} className="font-poppins">
-                      <FlippableCard isFlipped={flippedStates[cardIdx]} onClick={() => handleFlip(cardIdx)}>
-                        <FlippableCardFront>
-                          <Typography variant="h6">
-                            {userFlashCards[selectedCard].flashcards[index].front}
-                          </Typography>
-                        </FlippableCardFront>
-                        <FlippableCardBack>
-                          <Typography variant="h6">
-                            {userFlashCards[selectedCard].flashcards[index].back}
-                          </Typography>
-                        </FlippableCardBack>
-                      </FlippableCard>
-                    </StyledPaper>
-                  </Grid>
-                ))}
-              </Grid>
-  
-              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 4 }}>
-                <Button
-                  variant="outlined"
-                  sx={{
-                    fontWeight: 'bold',
-                    borderColor: 'black',
-                    color: 'black',
-                    backgroundColor: 'white',
-                    '&:hover': {
+          {userFlashCards[selectedCard] && userFlashCards[selectedCard].flashcards.length > 0 ? (
+            currentCardIndex >= userFlashCards[selectedCard].flashcards.length ? (
+              <>
+                <Typography variant="h4" sx={{ mt: 5 }} className="font-poppins">
+                  {incorrectCards.length === 0
+                    ? "Good Job! You got all cards correct."
+                    : `${incorrectCards.length} out of ${userFlashCards[selectedCard].flashcards.length} cards were marked as skipped.`}
+                </Typography>
+                <Typography variant="h6" sx={{ mb: 4 }} className="font-poppins">
+                  {incorrectCards.length === 0
+                    ? "You did a fantastic job reviewing the flashcards!"
+                    : "Focus on these flashcards, you had trouble with them."}
+                </Typography>
+
+                <Grid container spacing={2} justifyContent="center" alignItems="center">
+                {incorrectCards.map((flashcard, index) => (
+                <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+                  <div
+                    onClick={() => handleIncorrectCardFlip(index)}
+                    style={{
+                      width: '100%',
+                      height: '200px', // Adjust height as needed
+                      perspective: '1000px',
+                      borderRadius: '12px', // Rounded corners
+                      transition: 'box-shadow 0.3s ease',
+                    }}
+                  >
+                    <div
+                      style={{
+                        position: 'relative',
+                        width: '100%',
+                        height: '100%',
+                        transition: 'transform 0.6s',
+                        transformStyle: 'preserve-3d',
+                        transform: flipIndex === index ? 'rotateY(180deg)' : 'rotateY(0deg)',
+                        borderRadius: '12px', // Rounded corners
+                      }}
+                    >
+                      <div
+                        style={{
+                          position: 'absolute',
+                          width: '100%',
+                          height: '100%',
+                          backfaceVisibility: 'hidden',
+                          backgroundColor: colors[index % colors.length],
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: '16px',
+                          borderRadius: '12px', // Rounded corners
+                        }}
+                      >
+                        <CardContent>
+                          <Typography variant="body1">{flashcard.front}</Typography>
+                        </CardContent>
+                      </div>
+                      <div
+                        style={{
+                          position: 'absolute',
+                          width: '100%',
+                          height: '100%',
+                          backfaceVisibility: 'hidden',
+                          backgroundColor: '#f0f0f0',
+                          transform: 'rotateY(180deg)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: '16px',
+                          borderRadius: '12px', // Rounded corners
+                        }}
+                      >
+                        <CardContent>
+                          <Typography variant="body1">{flashcard.back}</Typography>
+                        </CardContent>
+                      </div>
+                    </div>
+                  </div>
+                </Grid>
+              ))}
+
+                </Grid>
+
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 4 }}>
+                  <Button
+                    variant="outlined"
+                    sx={{
+                      fontWeight: 'bold',
+                      borderColor: 'black',
+                      color: 'black',
+                      backgroundColor: 'white',
+                      '&:hover': {
+                        backgroundColor: 'black',
+                        color: 'white',
+                        borderColor: 'black',
+                      },
+                    }}
+                    onClick={() => handleCardClick(selectedCard)} // Allow reviewing the same set again
+                  >
+                    Review Again
+                  </Button>
+                  <Button
+                    variant="contained"
+                    sx={{
+                      ml: 2,
+                      fontWeight: 'bold',
                       backgroundColor: 'black',
                       color: 'white',
-                      borderColor: 'black',
-                    },
-                  }}
-                  onClick={() => handleCardClick(selectedCard)} // Allow reviewing the same set again
-                >
-                  Review Again
-                </Button>
+                      boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+                      '&:hover': {
+                        backgroundColor: 'black',
+                        boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.3)',
+                      },
+                    }}
+                    onClick={() => setSelectedCard(null)} // Go back to overview
+                  >
+                    Back to Dashboard
+                  </Button>
+                </Box>
+              </>
+            ) : (
+              <>
+              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
                 <Button
                   variant="contained"
                   sx={{
-                    ml: 2,
                     fontWeight: 'bold',
                     backgroundColor: 'black',
                     color: 'white',
@@ -255,55 +304,60 @@ export default function Dashboard() {
                   }}
                   onClick={() => setSelectedCard(null)} // Go back to overview
                 >
-                  Back to Overview
+                  Back to Dashboard
                 </Button>
-              </Box>
-            </>
-          ) : (
-            <>
+              </Stack>
               <Stack direction="row" justifyContent="center" alignItems="center" sx={{ mb: 2 }}>
                 <Typography variant="h5" className="font-poppins"> Study Set Card </Typography>
                 <Typography variant="h6" sx={{ minWidth: "60px", ml: 8 }} className="font-poppins">
                   {currentCardIndex + 1} / {userFlashCards[selectedCard].flashcards.length}
                 </Typography>
               </Stack>
-              <FlashcardBox isFlipped={isFlipped} onClick={handleCardFlip}>
-                <FlashcardContent isFlipped={isFlipped} side="front">
-                  {userFlashCards[selectedCard].flashcards[currentCardIndex].front}
-                </FlashcardContent>
-                <FlashcardContent isFlipped={isFlipped} side="back">
-                  {userFlashCards[selectedCard].flashcards[currentCardIndex].back}
-                </FlashcardContent>
-              </FlashcardBox>
-  
-              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 4 }}>
-                <IconButton aria-label="incorrect" sx={{ color: 'red', mx: 2 }} onClick={handleBackClick}>
-                  <CloseIcon sx={{ fontSize: 40 }} />
-                </IconButton>
-  
-                <Button variant="outlined"
-                  sx={{
-                    mx: 2,
-                    fontWeight: 'bold',
-                    borderColor: 'black',
-                    color: 'black',
-                    backgroundColor: 'white',
-                    '&:hover': {
-                      backgroundColor: 'black',
-                      color: 'white',
-                      borderColor: 'black',
-                    },
-                  }}
-                  onClick={handleNextCard}
+                <FlashcardBox 
+                  isFlipped={isFlipped} 
+                  onClick={handleCardFlip}
+                  cardColor={colors[currentCardIndex % colors.length]} // Dynamically change color based on currentCardIndex
                 >
-                  Next Card
-                </Button>
+                  <FlashcardContent isFlipped={isFlipped} side="front">
+                    {userFlashCards[selectedCard].flashcards[currentCardIndex].front}
+                  </FlashcardContent>
+                  <FlashcardContent isFlipped={isFlipped} side="back">
+                    {userFlashCards[selectedCard].flashcards[currentCardIndex].back}
+                  </FlashcardContent>
+                </FlashcardBox>
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 4 }}>
+                  <IconButton aria-label="incorrect" sx={{ color: 'red', mx: 2 }} onClick={handleBackClick}>
+                    <CloseIcon sx={{ fontSize: 40 }} />
+                  </IconButton>
   
-                <IconButton aria-label="correct" sx={{ color: 'green', mx: 2 }} onClick={handleCorrectCard}>
-                  <CheckIcon sx={{ fontSize: 40 }} />
-                </IconButton>
-              </Box>
-            </>
+                  <Button variant="outlined"
+                    sx={{
+                      mx: 2,
+                      fontWeight: 'bold',
+                      borderColor: 'black',
+                      color: 'black',
+                      backgroundColor: 'white',
+                      '&:hover': {
+                        backgroundColor: 'black',
+                        color: 'white',
+                        borderColor: 'black',
+                      },
+                    }}
+                    onClick={handleNextCard}
+                  >
+                    Next Card
+                  </Button>
+  
+                  <IconButton aria-label="correct" sx={{ color: 'green', mx: 2 }} onClick={handleCorrectCard}>
+                    <CheckIcon sx={{ fontSize: 40 }} />
+                  </IconButton>
+                </Box>
+              </>
+            )
+          ) : (
+            <Typography variant="h6" sx={{ mt: 5 }}>
+              No flashcards available in this set.
+            </Typography>
           )}
         </Container>
       ) : loading ? (
@@ -331,28 +385,50 @@ export default function Dashboard() {
           <Grid mt={2} container spacing={2}>
             {userFlashCards.map((set, index) => (
               <Grid item xs={12} sm={8} md={4} key={index}
-                sx={{
-                  width: '100%',
-                  transition: 'transform 0.3s ease',
-                  '&:hover': {
-                    transform: 'rotate(5deg)',
-                  },
-                  margin: 'auto',
-                  padding: 4,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                }} elevation={5}>
-                <StyledPaper
-                  cardColor={colors[index % colors.length]} // Cycle through colors
-                  onClick={() => handleCardClick(index)} // Handle card click
-                  sx={{ cursor: 'pointer' }} // Add pointer cursor on hover
+              sx={{
+                width: '100%',
+                transition: 'transform 0.3s ease',
+                '&:hover': {
+                  transform: 'rotate(5deg)',
+                },
+                margin: 'auto',
+                padding: 4,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }} elevation={5}>
+              <StyledPaper
+                cardColor={colors[index % colors.length]} // Cycle through colors
+                sx={{ 
+                  cursor: 'pointer', 
+                  position: 'relative',
+                  pointerEvents: 'auto' // Ensure the entire paper is clickable
+                }}
+                onClick={() => handleCardClick(index)} // Handle card click
+              >
+                <Typography variant="h6" sx={{ fontFamily: "'Poppins', sans-serif" }}>
+                  {set.id}
+                </Typography>
+                <IconButton
+                  aria-label="delete"
+                  sx={{ 
+                    position: 'absolute', 
+                    top: '8px', 
+                    right: '8px', 
+                    color: 'black',
+                    pointerEvents: 'auto' // Ensure the delete button is clickable
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent triggering the onClick for the card itself
+                    handleDeleteSet(set.id);
+                  }}
                 >
-                  <Typography variant="h6" sx={{ fontFamily: "'Poppins', sans-serif" }}>
-                    {set.id}
-                  </Typography>
-                </StyledPaper>
-              </Grid>
+                  <DeleteIcon />
+                </IconButton>
+              </StyledPaper>
+
+            </Grid>
+            
             ))}
           </Grid>
         </Container>

@@ -17,8 +17,8 @@ import {
   DialogContentText,
   DialogActions,
   Grid,
-  Card,
   CardContent,
+  CircularProgress, // Import CircularProgress for the loading animation
 } from '@mui/material';
 import Navbar from '../components/navbar'; // Ensure this import is correct
 
@@ -28,6 +28,7 @@ export default function Generate() {
   const [setName, setSetName] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [flipIndex, setFlipIndex] = useState(null); // Manage flip state
+  const [loading, setLoading] = useState(false); // Loading state
   const { user } = useUser();
   const router = useRouter();
   
@@ -40,6 +41,8 @@ export default function Generate() {
       alert('Please enter some text to generate flashcards.');
       return;
     }
+
+    setLoading(true); // Start loading
 
     try {
       const response = await fetch('/api/generate', {
@@ -69,6 +72,8 @@ export default function Generate() {
     } catch (error) {
       console.error('Error generating flashcards:', error);
       alert('An error occurred while generating flashcards. Please try again.');
+    } finally {
+      setLoading(false); // End loading
     }
   };
 
@@ -77,18 +82,20 @@ export default function Generate() {
       alert('Please enter a name for your flashcard set.');
       return;
     }
-
+  
+    setLoading(true); // Start loading
+  
     try {
       if (!user) {
         alert('User not found. Please log in and try again.');
         return;
       }
-
+  
       const userDocRef = doc(collection(db, 'users'), user.id);
       const userDocSnap = await getDoc(userDocRef);
-
+  
       const batch = writeBatch(db);
-
+  
       if (userDocSnap.exists()) {
         const userData = userDocSnap.data();
         const updatedSets = [...(userData.flashcardSets || []), { name: setName }];
@@ -96,20 +103,22 @@ export default function Generate() {
       } else {
         batch.set(userDocRef, { flashcardSets: [{ name: setName }] });
       }
-
+  
       const setDocRef = doc(collection(userDocRef, 'flashcardSets'), setName);
       batch.set(setDocRef, { flashcards });
-
+  
       await batch.commit();
-
-      alert('Flashcards saved successfully!');
-      handleCloseDialog();
-      setSetName('');
+  
+      // Redirect to /dashboard after saving and closing the dialog
+      router.push('/dashboard');
     } catch (error) {
       console.error('Error saving flashcards:', error);
       alert('An error occurred while saving flashcards. Please try again.');
+    } finally {
+      setLoading(false); // End loading
     }
   };
+  
 
   const handleCardClick = (index) => {
     setFlipIndex(flipIndex === index ? null : index);
@@ -148,8 +157,9 @@ export default function Generate() {
                 boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.3)',
               },
             }}
+            disabled={loading} // Disable the button while loading
           >
-            Generate Flashcards
+            {loading ? <CircularProgress size={24} color="inherit" /> : 'Generate Flashcards'}
           </Button>
 
           {flashcards.length > 0 && (
@@ -188,7 +198,6 @@ export default function Generate() {
                         height: '200px', // Adjust height as needed
                         perspective: '1000px',
                         borderRadius: '12px', // Rounded corners
-                        boxShadow: flipIndex === index ? '0px 0px 15px rgba(0, 0, 0, 0.5)' : '0px 4px 8px rgba(0, 0, 0, 0.1)',
                         transition: 'box-shadow 0.3s ease',
                       }}
                     >
@@ -287,8 +296,10 @@ export default function Generate() {
                   backgroundColor: 'black',
                   boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.3)',
                 },
-              }}>
-              Save
+              }}
+              disabled={loading} // Disable the button while loading
+            >
+              {loading ? <CircularProgress size={24} color="inherit" /> : 'Save'}
             </Button>
           </DialogActions>
         </Dialog>
