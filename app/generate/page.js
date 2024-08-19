@@ -18,7 +18,7 @@ import {
   DialogActions,
   Grid,
   CardContent,
-  CircularProgress, // Import CircularProgress for the loading animation
+  CircularProgress,
 } from '@mui/material';
 import Navbar from '../components/navbar'; 
 
@@ -27,15 +27,18 @@ export default function Generate() {
   const [flashcards, setFlashcards] = useState([]);
   const [setName, setSetName] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [subscriptionDialogOpen, setSubscriptionDialogOpen] = useState(false); // New dialog state
 
-  const [flipIndex, setFlipIndex] = useState(null); // Manage flip state
-  const [loading, setLoading] = useState(false); // Loading state
+  const [flipIndex, setFlipIndex] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const { user } = useUser();
   const router = useRouter();
   
   const handleOpenDialog = () => setDialogOpen(true);
   const handleCloseDialog = () => setDialogOpen(false);
+  const handleCloseSubscriptionDialog = () => setSubscriptionDialogOpen(false); // Close the subscription dialog
+
   const colors = ['#ffa4a3', '#b3f9c6', '#a6e7ff', '#e6dbff'];
 
   const handleSubmit = async () => {
@@ -44,7 +47,7 @@ export default function Generate() {
       return;
     }
 
-    setLoading(true); // Start loading
+    setLoading(true);
 
     try {
       const response = await fetch('/api/generate', {
@@ -75,7 +78,7 @@ export default function Generate() {
       console.error('Error generating flashcards:', error);
       alert('An error occurred while generating flashcards. Please try again.');
     } finally {
-      setLoading(false); // End loading
+      setLoading(false);
     }
   };
 
@@ -85,14 +88,14 @@ export default function Generate() {
       return;
     }
   
-    setLoading(true); // Start loading
+    if (!user) {
+      router.push('/sign-in');
+      return;
+    }
+  
+    setLoading(true);
   
     try {
-      if (!user) {
-        alert('User not found. Please log in and try again.');
-        return;
-      }
-  
       const userDocRef = doc(collection(db, 'users'), user.id);
       const userDocSnap = await getDoc(userDocRef);
   
@@ -100,10 +103,25 @@ export default function Generate() {
   
       if (userDocSnap.exists()) {
         const userData = userDocSnap.data();
-        const updatedSets = [...(userData.flashcardSets || []), { name: setName }];
+        const existingSets = userData.flashcardSets || [];
+  
+        if (existingSets.length >= 3 && userData.subscription.status !== 'pro') {
+          setSubscriptionDialogOpen(true); // Open the subscription dialog
+          setLoading(false);
+          return;
+        }
+  
+        const updatedSets = [...existingSets, { name: setName }];
         batch.update(userDocRef, { flashcardSets: updatedSets });
+  
+        if (!userData.subscription) {
+          batch.update(userDocRef, { subscription: { status: "base" } });
+        }
       } else {
-        batch.set(userDocRef, { flashcardSets: [{ name: setName }] });
+        batch.set(userDocRef, {
+          flashcardSets: [{ name: setName }],
+          subscription: { status: "base" }
+        });
       }
   
       const setDocRef = doc(collection(userDocRef, 'flashcardSets'), setName);
@@ -111,17 +129,15 @@ export default function Generate() {
   
       await batch.commit();
   
-      // Redirect to /dashboard after saving and closing the dialog
       router.push('/dashboard');
     } catch (error) {
       console.error('Error saving flashcards:', error);
       alert('An error occurred while saving flashcards. Please try again.');
     } finally {
-      setLoading(false); // End loading
+      setLoading(false);
     }
   };
   
-
   const handleCardClick = (index) => {
     setFlipIndex(flipIndex === index ? null : index);
   };
@@ -159,7 +175,7 @@ export default function Generate() {
                 boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.3)',
               },
             }}
-            disabled={loading} // Disable the button while loading
+            disabled={loading}
           >
             {loading ? <CircularProgress size={24} color="inherit" /> : 'Generate Flashcards'}
           </Button>
@@ -181,8 +197,9 @@ export default function Generate() {
                     boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.3)',
                   },
                 }}
+                disabled={loading}
               >
-                Save Flashcards
+                {loading ? <CircularProgress size={24} color="inherit" /> : 'Save Flashcards'}
               </Button>
             </Box>
           )}
@@ -197,9 +214,9 @@ export default function Generate() {
                       onClick={() => handleCardClick(index)}
                       style={{
                         width: '100%',
-                        height: '200px', // Adjust height as needed
+                        height: '200px',
                         perspective: '1000px',
-                        borderRadius: '12px', // Rounded corners
+                        borderRadius: '12px',
                         transition: 'box-shadow 0.3s ease',
                       }}
                     >
@@ -211,7 +228,7 @@ export default function Generate() {
                           transition: 'transform 0.6s',
                           transformStyle: 'preserve-3d',
                           transform: flipIndex === index ? 'rotateY(180deg)' : 'rotateY(0deg)',
-                          borderRadius: '12px', // Rounded corners
+                          borderRadius: '12px',
                         }}
                       >
                         <div
@@ -225,7 +242,7 @@ export default function Generate() {
                             alignItems: 'center',
                             justifyContent: 'center',
                             padding: '16px',
-                            borderRadius: '12px', // Rounded corners
+                            borderRadius: '12px',
                           }}
                         >
                           <CardContent>
@@ -244,7 +261,7 @@ export default function Generate() {
                             alignItems: 'center',
                             justifyContent: 'center',
                             padding: '16px',
-                            borderRadius: '12px', // Rounded corners
+                            borderRadius: '12px',
                           }}
                         >
                           <CardContent>
@@ -299,9 +316,46 @@ export default function Generate() {
                   boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.3)',
                 },
               }}
-              disabled={loading} // Disable the button while loading
+              disabled={loading}
             >
               {loading ? <CircularProgress size={24} color="inherit" /> : 'Save'}
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Subscription Limit Dialog */}
+        <Dialog open={subscriptionDialogOpen} onClose={handleCloseSubscriptionDialog}>
+          <DialogTitle>Upgrade Required</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              You have reached the limit of 3 flashcard sets with the Base subscription. Please upgrade to the Pro version to create more sets.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseSubscriptionDialog}
+              sx={{
+                fontWeight: 'bold',
+                backgroundColor: 'black',
+                color: 'white',
+                boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+                '&:hover': {
+                  backgroundColor: 'black',
+                  boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.3)',
+                },
+              }}>Close</Button>
+            <Button onClick={() => router.push('/#pricing')} color="primary"
+              sx={{
+                fontWeight: 'bold',
+                backgroundColor: 'black',
+                color: 'white',
+                boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+                '&:hover': {
+                  backgroundColor: 'black',
+                  boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.3)',
+                },
+              }}
+            >
+              Upgrade to Pro
             </Button>
           </DialogActions>
         </Dialog>
@@ -309,3 +363,4 @@ export default function Generate() {
     </>
   );
 }
+

@@ -13,7 +13,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 export async function POST(req) {
   try {
     const params = {
-      mode: 'subscription',
+      mode: 'payment',  // Change this from 'subscription' to 'payment'
       payment_method_types: ['card'],
       line_items: [
         {
@@ -22,11 +22,7 @@ export async function POST(req) {
             product_data: {
               name: 'Pro subscription',
             },
-            unit_amount: formatAmountForStripe(10, 'usd'), // $10.00
-            recurring: {
-              interval: 'month',
-              interval_count: 1,
-            },
+            unit_amount: formatAmountForStripe(1.5, 'usd'), // This is the one-time payment amount
           },
           quantity: 1,
         },
@@ -37,7 +33,7 @@ export async function POST(req) {
       cancel_url: `${req.headers.get(
         'origin',
       )}/result?session_id={CHECKOUT_SESSION_ID}`,
-    }
+    };
     
     const checkoutSession = await stripe.checkout.sessions.create(params)
     

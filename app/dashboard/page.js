@@ -13,7 +13,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
 import CircularProgress from '@mui/material/CircularProgress';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { doc, deleteDoc } from "firebase/firestore";
+import { doc, deleteDoc, updateDoc, arrayRemove, getDoc } from 'firebase/firestore';
+
 
 const FlashcardBox = styled(Box)(({ theme, isFlipped, cardColor }) => ({
   backgroundColor: cardColor,
@@ -133,21 +134,60 @@ export default function Dashboard() {
       }
     }
   };
+
+  const handleDeleteFromFirebase = async (setId) => {
+    if (!user) {
+      console.error("User is not authenticated.");
+      return;
+    }
   
-  const handleDeleteSet = async (setId) => {
-    if (user) {
-      const userId = user.id;
-      const flashcardSetDocRef = doc(db, `users/${userId}/flashcardSets`, setId);
+    const userId = user.id;
+    const userDocRef = doc(db, 'users', userId);
   
-      try {
-        await deleteDoc(flashcardSetDocRef);
-        setUserFlashCards(prev => prev.filter(set => set.id !== setId)); // Update the state to remove the deleted set
-      } catch (error) {
-        console.error("Error deleting flashcard set: ", error);
+    // Optimistically update the UI before making the database call
+    setUserFlashCards(prev => prev.filter(set => set.name !== setId));
+  
+    // Retrieve the current user document
+    const userDocSnap = await getDoc(userDocRef);
+    if (userDocSnap.exists()) {
+      const userData = userDocSnap.data();
+  
+      // Find the flashcard set to remove
+      const flashcardSetToRemove = userData.flashcardSets.find(set => set.name === setId);
+      
+      if (flashcardSetToRemove) {
+        // Remove the specific flashcard set from the array in Firestore
+        await updateDoc(userDocRef, {
+          flashcardSets: arrayRemove(flashcardSetToRemove)
+        });
+      } else {
+        console.error("Flashcard set not found in the user's document.");
       }
+    } else {
+      console.error("User document does not exist.");
     }
   };
   
+  const handleDeleteSet = async (setId) => {
+    if (!user) {
+        console.error("User is not authenticated.");
+        return;
+    }
+
+    const userId = user.id;
+    const flashcardSetDocRef = doc(db, `users/${userId}/flashcardSets`, setId);
+
+    try {
+        // Delete the flashcard set document from Firestore
+        await deleteDoc(flashcardSetDocRef);
+        setUserFlashCards(prev => prev.filter(set => set.id !== setId));
+        console.log("Flashcard set removed from UI.");
+        handleDeleteFromFirebase(setId);
+    } catch (error) {
+        console.error("Error deleting flashcard set:", error);
+    }
+};
+
   const handleCorrectCard = () => {
     if (selectedCard !== null) {
       setCorrectCards((prev) => prev + 1);
@@ -406,7 +446,7 @@ export default function Dashboard() {
                 }}
                 onClick={() => handleCardClick(index)} // Handle card click
               >
-                <Typography variant="h6" sx={{ fontFamily: "'Poppins', sans-serif" }}>
+                <Typography variant="h6" className="font-poppins">
                   {set.id}
                 </Typography>
                 <IconButton

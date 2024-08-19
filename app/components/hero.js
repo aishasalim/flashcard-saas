@@ -5,7 +5,6 @@ import { useUser } from '@clerk/nextjs';
 
 export default function HeroSection() {
   const { isSignedIn } = useUser(); // Check if the user is signed in
-
   return (
     <Container maxWidth="lg">
       <Box sx={{ textAlign: 'center', my: 20 }}>

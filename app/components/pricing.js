@@ -1,36 +1,60 @@
 'use client';
 
-import React from 'react';
-import { Container, Typography, Grid, Stack, Paper, Button } from '@mui/material';
+import React, { useState } from 'react';
+import { Container, Typography, Grid, Stack, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import Link from 'next/link';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useRouter } from 'next/navigation';
+import { useUser } from '@clerk/nextjs';
+import { doc, getDoc, collection } from 'firebase/firestore';
+import { db } from '../firebase';
 
 export default function PricingSection() {
   const router = useRouter();
+  const { user } = useUser();
+  const [openDialog, setOpenDialog] = useState(false);
 
-  const handleSubmit = async () => {
+  const handleUpgradeClick = async () => {
+    if (!user) {
+      alert('You need to sign in first!');
+      return;
+    }
+
     try {
-      const response = await fetch('/api/checkout_sessions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const userDocRef = doc(collection(db, 'users'), user.id);
+      const userDocSnap = await getDoc(userDocRef);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'An error occurred');
+      if (!userDocSnap.exists()) {
+        // User does not exist, open the dialog
+        setOpenDialog(true);
+      } else {
+        // Proceed with the payment flow
+        const response = await fetch('/api/checkout_sessions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error?.message || 'An error occurred');
+        }
+
+        const session = await response.json();
+
+        // Redirect to Stripe Checkout
+        router.push(session.url);
       }
-
-      const session = await response.json();
-
-      // Redirect to Stripe Checkout
-      router.push(session.url);
     } catch (error) {
-      console.error('Error in handleSubmit:', error);
+      console.error('Error in handleUpgradeClick:', error);
       alert('An error occurred while processing your request. Please try again.');
     }
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    router.push('/generate'); // Redirect to the card generation page
   };
 
   const pricing = [
@@ -39,7 +63,7 @@ export default function PricingSection() {
       price: "$0",
       description: "Free",
       features: [
-        "Access to standard flashcards",
+        "Access to basic features",
         "Limited flashcard generation",
         "Limited saved flashcard sets",
       ],
@@ -49,8 +73,8 @@ export default function PricingSection() {
     },
     {
       title: "Pro",
-      price: "$10",
-      description: "Per month",
+      price: "$1.50",
+      description: "One time",
       features: [
         "Exclusive content and features",
         "Unlimited flashcard generation",
@@ -137,7 +161,7 @@ export default function PricingSection() {
                 ) : (
                   <Button
                     variant="contained"
-                    onClick={handleSubmit}
+                    onClick={handleUpgradeClick}
                     sx={{
                       width: '100%',
                       mt: 4,
@@ -159,6 +183,30 @@ export default function PricingSection() {
           </Grid>
         ))}
       </Grid>
+
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle>Welcome!</DialogTitle>
+        <DialogContent>
+          <Typography>
+            It seems like you're new here. Let's get started by generating your first flashcards!
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="primary"
+              sx={{
+                fontWeight: 'bold',
+                backgroundColor: 'black',
+                color: 'white',
+                boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+                '&:hover': {
+                  backgroundColor: 'black',
+                  boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.3)',
+                },
+              }}>
+            Generate Your First Cards
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }
